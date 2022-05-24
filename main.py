@@ -38,7 +38,6 @@ max_msg_per_window = 4
 over_max_msg_per_window = 6
 author_msg_times = {}
 
-
 songs = []
 current_song = ''
 current_song_num = 0
@@ -50,6 +49,11 @@ channels_Sticks = {}
 async def on_ready():
     await client.change_presence(activity=discord.Game(name="rofa"))
     print("abo lahab is ready as {0.user}".format(client))
+
+
+@client.event
+async def on_thread_join(thread):
+    await thread.join()
 
 
 @client.event
@@ -98,13 +102,13 @@ async def on_raw_reaction_add(reaction):
                 voice.pause()
             else:
                 voice.resume()
-            current_song_num-=1
+            current_song_num -= 1
             await editSongsMsg()
             playNext(client)
         elif str(reaction.emoji) == '▶':
             user = client.get_user(reaction.user_id)
             await msg.remove_reaction(str(reaction.emoji), user)
-            if not current_song_num>len(songs):
+            if not current_song_num > len(songs):
                 if voice.is_playing():
                     voice.pause()
                 await editSongsMsg()
@@ -112,10 +116,10 @@ async def on_raw_reaction_add(reaction):
         elif str(reaction.emoji) == '◀':
             user = client.get_user(reaction.user_id)
             await msg.remove_reaction(str(reaction.emoji), user)
-            if not current_song_num<1:
+            if not current_song_num < 1:
                 if voice.is_playing():
                     voice.pause()
-                current_song_num-=2
+                current_song_num -= 2
                 await editSongsMsg()
                 playNext(client)
 
@@ -158,17 +162,17 @@ async def editSongsMsg():
 async def sendSongsMsg(channel):
     global songMsg
     embed = discord.Embed.from_dict(eval("{" + f"'color': 5111808, 'type': 'rich',"
-                                                   "'description': '**Songs list**\\n'}"))
+                                               "'description': '**Songs list**\\n'}"))
     global current_song_num
     if len(str(current_song_num)) == 1:
-        current_song_num = "0"+str(current_song_num)
+        current_song_num = "0" + str(current_song_num)
     for song_num in range(len(songs)):
         if song_num == int(current_song_num):
-            songs_names = "**" + str(songs[song_num].get('title', None)+ "**" + "\n")
+            songs_names = "**" + str(songs[song_num].get('title', None) + "**" + "\n")
             embed.add_field(name=f"**{song_num + 1}/**", value=f"{songs_names}", inline=True)
         else:
             songs_names = str(songs[song_num].get('title', None) + "\n")
-            embed.add_field(name=f"{song_num+1}/ ",value=f"{songs_names}", inline=True)
+            embed.add_field(name=f"{song_num + 1}/ ", value=f"{songs_names}", inline=True)
 
     song_msg = await channel.send(embed=embed)
     songMsg.append(song_msg)
@@ -181,7 +185,7 @@ def playNext(client):
     guild = client.get_guild(729300120897716275)
     voice = discord.utils.get(client.voice_clients, guild=guild)
     current_song = discord.FFmpegPCMAudio(songs[int(current_song_num)]['formats'][0]['url'], **FFMPEG_OPTIONS)
-    current_song_num = int(current_song_num)+1
+    current_song_num = int(current_song_num) + 1
     voice.play(current_song, after=lambda e: playNext(client))
 
 
@@ -206,9 +210,10 @@ async def play_music(client, message):
                 else:
                     songs.append(info)
                 if not voice.is_playing():
-                    current_song = discord.FFmpegPCMAudio(songs[current_song_num]['formats'][0]['url'], **FFMPEG_OPTIONS)
+                    current_song = discord.FFmpegPCMAudio(songs[current_song_num]['formats'][0]['url'],
+                                                          **FFMPEG_OPTIONS)
                     await sendSongsMsg(message.channel)
-                    current_song_num+=1
+                    current_song_num += 1
                     voice.play(current_song, after=lambda e: playNext(client))
                 else:
                     await sendSongsMsg(message.channel)
@@ -221,7 +226,7 @@ async def play_music(client, message):
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(songs[current_song_num], download=False)
                     current_song = discord.FFmpegPCMAudio(info['formats'][0]['url'], **FFMPEG_OPTIONS)
-                    current_song_num+=1
+                    current_song_num += 1
                     await voice.play(current_song, after=lambda e: playNext(client))
         except:
             pass
@@ -240,14 +245,15 @@ async def on_message(message):
         msg_id = msg.author.id
     else:
         msg_id = 0
-    if msg_id == 974401140466782219 or 'abo lahab' in message.content.lower() or 'abolahab' in message.content.lower() or '<@974401140466782219>' in message.content.lower():
+    if msg_id == 974401140466782219 or 'abo lahab' in message.content.lower() or 'abolahab' in message.content.lower() or '<@974401140466782219>' in message.content.lower()\
+            or message.content.startswith("$"):
         guild = client.get_guild(729300120897716275)
         voice = discord.utils.get(client.voice_clients, guild=guild)
-        if "play" in message.content.lower():
+        if message.content.lower().startswith("play"):
             playing = str(message.content)
             for i in ['abo lahab', 'abolahab', '<@974401140466782219>', 'play']:
                 try:
-                    playing = playing.lower().replace(i.lower(),'')
+                    playing = playing.lower().replace(i.lower(), '')
                 except:
                     pass
             await client.change_presence(activity=discord.Game(name=str(playing)))
@@ -295,11 +301,13 @@ async def on_message(message):
 
     if message.content.lower().startswith("a") and len(message.content) > 1:
         if message.content[1] == "1":
-            await message.channel.send("Rule A1 : No blank nicknames, no inappropriate nicknames and no sexually explicit nicknames.")
+            await message.channel.send(
+                "Rule A1 : No blank nicknames, no inappropriate nicknames and no sexually explicit nicknames.")
         elif message.content[1] == "2":
             await message.channel.send("Rule A2 : No blank profile pictures and no inappropriate profile pictures.")
         elif message.content[1] == "3":
-            await message.channel.send("Rule A3 :  Moderators reserve the right to change nicknames and reserve the right to use their own discretion regardless of any rule..")
+            await message.channel.send(
+                "Rule A3 :  Moderators reserve the right to change nicknames and reserve the right to use their own discretion regardless of any rule..")
         elif message.content[1] == "4":
             await message.channel.send("Rule A4:  No inviting bots.")
         elif message.content[1] == "5":
@@ -308,22 +316,26 @@ async def on_message(message):
             await message.channel.send("Rule A6:  Rules apply to DMing other members of the server.")
     elif message.content.lower().startswith("b"):
         if message.content[1] == "1":
-            await message.channel.send("Rule B1 :  No annoying, loud or high pitch noises and reduce the amount of background noise, if possible.")
+            await message.channel.send(
+                "Rule B1 :  No annoying, loud or high pitch noises and reduce the amount of background noise, if possible.")
         elif message.content[1] == "2":
-            await message.channel.send("Rule B2 : Moderators reserve the right to disconnect you from a voice channel if your sound quality is poo abd reserve the right to disconnect, mute, deafen, or move members to and from voice channels.")
+            await message.channel.send(
+                "Rule B2 : Moderators reserve the right to disconnect you from a voice channel if your sound quality is poo abd reserve the right to disconnect, mute, deafen, or move members to and from voice channels.")
     elif message.content.lower().startswith("c"):
         if message.content[1] == "1":
             await message.channel.send("Rule C1 : No commands spam.")
         elif message.content[1] == "2":
             await message.channel.send("Rule C2 :  No playing music except in the music room.")
 
-    if message.content.lower().startswith("ya abo lahab") or message.content.lower() == "<@974401140466782219>" or message.content.lower() == "abolahab" \
+    if message.content.lower().startswith(
+            "ya abo lahab") or message.content.lower() == "<@974401140466782219>" or message.content.lower() == "abolahab" \
             or message.content.lower() == "abo lahab":
         replies = ["5eer", "na3am", "na3ameen", "ha?", "eh yasta"]
         await message.channel.send(random.choice(replies))
 
     if "jhonny sins" in message.content.lower():
-        await message.channel.send("https://tenor.com/view/johnny-sins-erik-dal%C4%B1-sins-erik-dal%C4%B1-erik-dance-gif-16064270")
+        await message.channel.send(
+            "https://tenor.com/view/johnny-sins-erik-dal%C4%B1-sins-erik-dal%C4%B1-erik-dance-gif-16064270")
 
     if "happy dance" in message.content.lower():
         await message.channel.send("https://tenor.com/view/cute-cat-kitten-excited-dance-gif-23200050")
@@ -333,10 +345,12 @@ async def on_message(message):
             await message.channel.send("MAWLAAAAAAAAAAAAAAAAAAAAAAAAAAAAY")
 
     if 'siu' in message.content.lower() or 'sui' in message.content.lower():
-        await message.channel.send("https://tenor.com/view/siu-ronaldo-siu-cristiano-cristiano-ronaldo-siu-meme-gif-24574747")
+        await message.channel.send(
+            "https://tenor.com/view/siu-ronaldo-siu-cristiano-cristiano-ronaldo-siu-meme-gif-24574747")
     if message.content.startswith("$"):
-        embed = discord.Embed.from_dict(eval("{'color': 5111808, 'type': 'rich','description': '"+str(message.author)+"\\n\\n hwa elly 2al :     "+message.content[1:]+
-                                             " \\n\\n fe "+str(f"<#{message.channel.id}>")+"'}"))
+        embed = discord.Embed.from_dict(eval("{'color': 5111808, 'type': 'rich','description': '" + str(
+            message.author) + "\\n\\n hwa elly 2al :    " + message.content[1:] +
+                                             " \\n\\n fe " + str(f"<#{message.channel.id}>") + "'}"))
         await bot_channel.send(embed=embed)
         await message.channel.send(message.content[1:])
         await message.delete()
@@ -380,9 +394,9 @@ async def on_voice_state_update(member, before, after):
     guild = client.get_guild(729300120897716275)
     vc_role = get(guild.roles, id=VC_role)
     if before.channel is None and after.channel:
-       await member.add_roles(vc_role)
+        await member.add_roles(vc_role)
     elif after.channel is None:
-       await member.remove_roles(vc_role)
+        await member.remove_roles(vc_role)
 
 
 client.run(TOKEN)
