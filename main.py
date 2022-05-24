@@ -245,8 +245,7 @@ async def on_message(message):
         msg_id = msg.author.id
     else:
         msg_id = 0
-    if msg_id == 974401140466782219 or 'abo lahab' in message.content.lower() or 'abolahab' in message.content.lower() or '<@974401140466782219>' in message.content.lower()\
-            or message.content.startswith("$"):
+    if msg_id == 974401140466782219 or 'abo lahab' in message.content.lower() or 'abolahab' in message.content.lower() or '<@974401140466782219>' in message.content.lower():
         guild = client.get_guild(729300120897716275)
         voice = discord.utils.get(client.voice_clients, guild=guild)
         if message.content.lower().startswith("play"):
