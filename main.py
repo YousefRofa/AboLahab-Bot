@@ -43,6 +43,7 @@ songs = []
 current_song = ''
 current_song_num = 0
 songMsg = []
+channels_Sticks = {}
 
 
 @client.event
@@ -228,7 +229,7 @@ async def play_music(client, message):
 
 @client.event
 async def on_message(message):
-    global author_msg_counts,current_song
+    global author_msg_counts, current_song, channels_Sticks
     guild = client.get_guild(729300120897716275)
     bot_channel = guild.get_channel(974652633732235265)
     if message.author == client.user:
@@ -270,7 +271,29 @@ async def on_message(message):
         elif "4a8al" in message.content.lower():
             await play_music(client, message)
 
-    if message.content.lower().startswith(f"a") and len(message.content) > 1:
+    if message.content.lower().startswith("stick"):
+        stick_content = message.content[5:]
+        channels_Sticks[message.channel] = [stick_content]
+        await message.channel.send("Channel sticked !")
+
+    if message.content.lower().startswith("unstick"):
+        for channel in channels_Sticks.keys():
+            if message.channel == channel:
+                channels_Sticks.pop(channel)
+                await message.channel.send("Channel unsticked !")
+                break
+
+    for channel in channels_Sticks.keys():
+        if message.channel == channel:
+            if len(channels_Sticks.get(channel)) == 2:
+                await channels_Sticks[channel][1].delete()
+            else:
+                channels_Sticks[channel].append("")
+            sticky_message = await channel.send(channels_Sticks.get(channel)[0])
+            channels_Sticks[channel][1] = sticky_message
+        message.channel.send("Message sticked in this channel !")
+
+    if message.content.lower().startswith("a") and len(message.content) > 1:
         if message.content[1] == "1":
             await message.channel.send("Rule A1 : No blank nicknames, no inappropriate nicknames and no sexually explicit nicknames.")
         elif message.content[1] == "2":
@@ -283,12 +306,12 @@ async def on_message(message):
             await message.channel.send("Rule A5:  No bugs, exploits, glitches, hacks, bugs, etc.")
         elif message.content[1] == "6":
             await message.channel.send("Rule A6:  Rules apply to DMing other members of the server.")
-    elif message.content.lower().startswith(f"b"):
+    elif message.content.lower().startswith("b"):
         if message.content[1] == "1":
             await message.channel.send("Rule B1 :  No annoying, loud or high pitch noises and reduce the amount of background noise, if possible.")
         elif message.content[1] == "2":
             await message.channel.send("Rule B2 : Moderators reserve the right to disconnect you from a voice channel if your sound quality is poo abd reserve the right to disconnect, mute, deafen, or move members to and from voice channels.")
-    elif message.content.lower().startswith(f"c"):
+    elif message.content.lower().startswith("c"):
         if message.content[1] == "1":
             await message.channel.send("Rule C1 : No commands spam.")
         elif message.content[1] == "2":
