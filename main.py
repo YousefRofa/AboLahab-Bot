@@ -6,6 +6,7 @@ import re
 import random
 import os
 
+
 TOKEN = os.environ.get("TOKEN")
 intents = discord.Intents().default()
 intents.members = True
