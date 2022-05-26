@@ -2,13 +2,11 @@ import discord
 from discord.utils import get
 import datetime
 import youtube_dl
-import os
 import re
-import asyncio
 import random
-import time
+import os
 
-TOKEN = ""
+TOKEN = os.environ.get("TOKEN")
 intents = discord.Intents().default()
 intents.members = True
 
@@ -186,6 +184,7 @@ def playNext(client):
     voice = discord.utils.get(client.voice_clients, guild=guild)
     current_song = discord.FFmpegPCMAudio(songs[int(current_song_num)]['formats'][0]['url'], **FFMPEG_OPTIONS)
     current_song_num = int(current_song_num) + 1
+    editSongsMsg()
     voice.play(current_song, after=lambda e: playNext(client))
 
 
@@ -399,4 +398,3 @@ async def on_voice_state_update(member, before, after):
 
 
 client.run(TOKEN)
-
