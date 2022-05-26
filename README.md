@@ -8,4 +8,4 @@ server.
 ### What does the bot do ?
 Abolahab has many features that you can find in main.py including playing music, sending gifs, replies to messages and many more 
 
-It is also used by moderators of the server to warn, kick, ban, mute or timeout members quickly and easily 
+It is also used by moderators of the server to warn, kick, ban, mute or timeout members quickly and easily !!
