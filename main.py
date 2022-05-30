@@ -5,12 +5,14 @@ import youtube_dl
 import re
 import random
 import os
+import time
+import asyncio
 
 TOKEN = os.environ.get("TOKEN")
 intents = discord.Intents().default()
 intents.members = True
-
 client = discord.Client(intents=intents)
+
 game_roles = {"valorant": "<@&858019403169267712>",
               "gta": "<@&851423984583311370>",
               "minecraft": "<@&851410979967336459>",
@@ -236,6 +238,8 @@ async def on_message(message):
     global author_msg_counts, current_song, channels_Sticks
     guild = client.get_guild(729300120897716275)
     bot_channel = guild.get_channel(974652633732235265)
+    channel = message.channel
+
     if message.author == client.user:
         return
 
@@ -274,6 +278,153 @@ async def on_message(message):
             await message.channel.send("24tato")
         elif "4a8al" in message.content.lower():
             await play_music(client, message)
+        elif "hide" in message.content.lower():
+            await message.channel.send("** **"+" \n " * 45 +"** **")
+
+        sender_roles = [role.id for role in message.author.roles]
+        if 850747622431916052 in sender_roles:
+            for word in ['2ms7', '2msa7', 'delete']:
+                if word in message.content.lower():
+                    num = [int(s) for s in message.content.split() if s.isdigit()]
+                    fetchMessage = await message.channel.history(limit=num[0]).flatten()
+                    if fetchMessage:
+                        for m in fetchMessage:
+                            await m.delete()
+                    await channel.send(f"tam mas7 {num[0]} messages benaga7")
+                    return
+
+            if "unmute" in message.content.lower():
+                try:
+                    try:
+                        user = message.mentions[0]
+                    except:
+                        try:
+                            user = message.guild.get_member(int(message.content.split()[2]))
+                        except:
+                            user = message.guild.get_member_named(message.content.split()[2])
+                    role = discord.utils.get(message.guild.roles, id=980432486876209242)
+                    await user.remove_roles(role)
+                    log_channel = client.get_channel(871751327481466901)
+                    last_ban_msg = await log_channel.history(limit=1).flatten()
+                    reason = " ".join(message.content.split()[3:])
+                    case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                    ban_msg = f"""Case #{case_no} | [Unmute]\nUsername: {user.name}#{user.discriminator} ({user.id})\nModerator: {message.author.mention}\nReason: {reason}"""
+                    await log_channel.send(content=f"{ban_msg}")
+                except Exception as e:
+                    print(e)
+                    await channel.send("el wad da m4 muted 2sln")
+                return
+            if "mute" in message.content.lower():
+                try:
+                    user = message.mentions[0]
+                except:
+                    try:
+                        user = message.guild.get_member(int(message.content.split()[2]))
+                    except:
+                        user = message.guild.get_member_named(message.content.split()[2])
+                if user.id == 481932096986939403:
+                    await channel.send("3ayz t3ml mute l rofa broo7 omak? :rofl:")
+                    return
+                role = discord.utils.get(message.guild.roles, id=980432486876209242)
+                await user.add_roles(role)
+                log_channel = client.get_channel(871751327481466901)
+                reason = " ".join(message.content.split()[3:])
+                if reason == " ":
+                    reason = "None"
+                last_ban_msg = await log_channel.history(limit=1).flatten()
+                case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                ban_msg = f"""Case #{case_no} | [Mute]\nUsername: {user.name}#{user.discriminator} ({user.id})\nModerator: {message.author.mention}\nReason: {reason}"""
+                await log_channel.send(content=f"{ban_msg}")
+                return
+            if "untimeout" in message.content.lower():
+                try:
+                    try:
+                        user = message.mentions[0]
+                    except:
+                        try:
+                            user = message.guild.get_member(int(message.content.split()[2]))
+                        except:
+                            user = message.guild.get_member_named(message.content.split()[2])
+                    role = discord.utils.get(message.guild.roles, id=980484211393830953)
+                    await user.remove_roles(role)
+                    log_channel = client.get_channel(871751327481466901)
+                    last_ban_msg = await log_channel.history(limit=1).flatten()
+                    reason = " ".join(message.content.split()[3:])
+                    case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                    ban_msg = f"""Case #{case_no} | [Untimed out]\nUsername: {user.name}#{user.discriminator} ({user.id})\nModerator: {message.author.mention}\nReason: {reason}"""
+                    await log_channel.send(content=f"{ban_msg}")
+                except Exception as e:
+                    print(e)
+                    await channel.send("el wad da m4 timed out 2sln")
+                return
+            if "timeout" in message.content.lower():
+                try:
+                    user = message.mentions[0]
+                except:
+                    try:
+                        user = message.guild.get_member(int(message.content.split()[2]))
+                    except:
+                        user = message.guild.get_member_named(message.content.split()[2])
+                time_ = message.content.split()[3]
+                reason = " ".join(message.content.split()[4:])
+                if time_.lower() == "unspecified" or time_.lower() == "permanent" or time_.lower() == "undecided":
+                    seconds = 86400 * 28
+                else:
+                    seconds = 0
+                    if "d" in time_:
+                        seconds += int(time_.split("d")[0]) * 86400
+                        time_ = time_.split("d")[1]
+                    if "h" in time_:
+                        seconds += int(time_.split("h")[0]) * 3600
+                        time_ = time_.split("h")[1]
+                    if "m" in time_:
+                        seconds += int(time_.split("m")[0]) * 60
+                        time_ = time_.split("m")[1]
+                    if "s" in time_:
+                        seconds += int(time_.split("s")[0])
+                role = discord.utils.get(message.guild.roles, id=980484211393830953)
+                await user.add_roles(role)
+                human_readable_time = f"{seconds // 86400}d {(seconds % 86400) // 3600}h {(seconds % 3600) // 60}m {seconds % 60}s"
+                log_channel = client.get_channel(871751327481466901)
+                last_ban_msg = await log_channel.history(limit=1).flatten()
+                case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                ban_msg = f"""Case #{case_no} | [Timeout]\nUsername: {user.name}#{user.discriminator} ({user.id})\nModerator: {message.author.mention}\nReason: {reason}\nDuration: {human_readable_time}\nUntil: <t:{int(time.time()) + seconds}> (<t:{int(time.time()) + seconds}:R>)"""
+                await log_channel.send(content=f"{ban_msg}")
+
+                await asyncio.sleep(seconds)
+                await user.remove_roles(role)
+                return
+            if "unban" in message.content.lower():
+                user = int(message.content.split()[2])
+                bans = await message.guild.bans()
+                for ban in bans:
+                    if ban.user.id == user:
+                        await message.guild.unban(ban.user)
+                        reason = " ".join(message.content.split()[3:])
+                        log_channel = client.get_channel(871751327481466901)
+                        last_ban_msg = await log_channel.history(limit=1).flatten()
+                        case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                        ban_msg = f"""Case #{case_no} | [Unban]\nUsername: {ban.user.name}#{ban.user.discriminator} ({ban.user.id})\nModerator: {message.author.mention}\nReason: {reason}"""
+                        await log_channel.send(content=f"{ban_msg}")
+                return
+            if "ban" in message.content.lower():
+                try:
+                    user = message.mentions[0]
+                except:
+                    try:
+                        user = message.guild.get_member(int(message.content.split()[2]))
+                    except:
+                        user = message.guild.get_member_named(message.content.split()[2])
+
+                await message.guild.ban(user, delete_message_days=1)
+                reason = " ".join(message.content.split()[3:])
+                log_channel = client.get_channel(871751327481466901)
+                last_ban_msg = await log_channel.history(limit=1).flatten()
+                case_no = int(''.join(list(filter(str.isdigit, last_ban_msg[0].content.splitlines()[0])))) + 1
+                ban_msg = f"""Case #{case_no} | [Ban]\nUsername: {user.name}#{user.discriminator} ({user.id})\nModerator: {message.author.mention}\nReason: {reason}"""
+                await log_channel.send(content=f"{ban_msg}")
+                return
+
 
     if message.content.lower().startswith("stick"):
         stick_content = message.content[5:]
@@ -297,33 +448,34 @@ async def on_message(message):
             channels_Sticks[channel][1] = sticky_message
         message.channel.send("Message sticked in this channel !")
 
-    if message.content.lower().startswith("a") and len(message.content) > 1:
-        if message.content[1] == "1":
-            await message.channel.send(
-                "Rule A1 : No blank nicknames, no inappropriate nicknames and no sexually explicit nicknames.")
-        elif message.content[1] == "2":
-            await message.channel.send("Rule A2 : No blank profile pictures and no inappropriate profile pictures.")
-        elif message.content[1] == "3":
-            await message.channel.send(
-                "Rule A3 :  Moderators reserve the right to change nicknames and reserve the right to use their own discretion regardless of any rule..")
-        elif message.content[1] == "4":
-            await message.channel.send("Rule A4:  No inviting bots.")
-        elif message.content[1] == "5":
-            await message.channel.send("Rule A5:  No bugs, exploits, glitches, hacks, bugs, etc.")
-        elif message.content[1] == "6":
-            await message.channel.send("Rule A6:  Rules apply to DMing other members of the server.")
-    elif message.content.lower().startswith("b"):
-        if message.content[1] == "1":
-            await message.channel.send(
-                "Rule B1 :  No annoying, loud or high pitch noises and reduce the amount of background noise, if possible.")
-        elif message.content[1] == "2":
-            await message.channel.send(
-                "Rule B2 : Moderators reserve the right to disconnect you from a voice channel if your sound quality is poo abd reserve the right to disconnect, mute, deafen, or move members to and from voice channels.")
-    elif message.content.lower().startswith("c"):
-        if message.content[1] == "1":
-            await message.channel.send("Rule C1 : No commands spam.")
-        elif message.content[1] == "2":
-            await message.channel.send("Rule C2 :  No playing music except in the music room.")
+    if len(message.content) == 2:
+        if message.content.lower().startswith("a"):
+            if message.content[1] == "1":
+                await message.channel.send(
+                    "Rule A1 : No blank nicknames, no inappropriate nicknames and no sexually explicit nicknames.")
+            elif message.content[1] == "2":
+                await message.channel.send("Rule A2 : No blank profile pictures and no inappropriate profile pictures.")
+            elif message.content[1] == "3":
+                await message.channel.send(
+                    "Rule A3 :  Moderators reserve the right to change nicknames and reserve the right to use their own discretion regardless of any rule..")
+            elif message.content[1] == "4":
+                await message.channel.send("Rule A4:  No inviting bots.")
+            elif message.content[1] == "5":
+                await message.channel.send("Rule A5:  No bugs, exploits, glitches, hacks, bugs, etc.")
+            elif message.content[1] == "6":
+                await message.channel.send("Rule A6:  Rules apply to DMing other members of the server.")
+        elif message.content.lower().startswith("b"):
+            if message.content[1] == "1":
+                await message.channel.send(
+                    "Rule B1 :  No annoying, loud or high pitch noises and reduce the amount of background noise, if possible.")
+            elif message.content[1] == "2":
+                await message.channel.send(
+                    "Rule B2 : Moderators reserve the right to disconnect you from a voice channel if your sound quality is poo abd reserve the right to disconnect, mute, deafen, or move members to and from voice channels.")
+        elif message.content.lower().startswith("c"):
+            if message.content[1] == "1":
+                await message.channel.send("Rule C1 : No commands spam.")
+            elif message.content[1] == "2":
+                await message.channel.send("Rule C2 :  No playing music except in the music room.")
 
     if message.content.lower().startswith(
             "ya abo lahab") or message.content.lower() == "<@974401140466782219>" or message.content.lower() == "abolahab" \
