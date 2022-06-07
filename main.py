@@ -494,7 +494,7 @@ async def on_message(message):
         if word in message.content.lower():
             await message.channel.send("MAWLAAAAAAAAAAAAAAAAAAAAAAAAAAAAY")
 
-    if 'siu' in message.content.lower() or 'sui' in message.content.lower():
+    if 'siu' in message.content.lower() or 'sui' in message.content.lower() and message.channel.id == 983327125480275979:
         await message.channel.send(
             "https://tenor.com/view/siu-ronaldo-siu-cristiano-cristiano-ronaldo-siu-meme-gif-24574747")
     if message.content.startswith("$"):
@@ -517,26 +517,27 @@ async def on_message(message):
         author_msg_times[author_id] = []
 
     # Append the time of this message to the users list of message times
-    author_msg_times[author_id].append(curr_time)
+    if message.channel.id != 983327125480275979:
+        author_msg_times[author_id].append(curr_time)
 
-    # Find the beginning of our time window.
-    expr_time = curr_time - time_window_milliseconds
+        # Find the beginning of our time window.
+        expr_time = curr_time - time_window_milliseconds
 
-    # Find message times which occurred before the start of our window
-    expired_msgs = [
-        msg_time for msg_time in author_msg_times[author_id]
-        if msg_time < expr_time
-    ]
+        # Find message times which occurred before the start of our window
+        expired_msgs = [
+            msg_time for msg_time in author_msg_times[author_id]
+            if msg_time < expr_time
+        ]
 
-    # Remove all the expired messages times from our list
-    for msg_time in expired_msgs:
-        author_msg_times[author_id].remove(msg_time)
-    # ^ note: we probably need to use a mutex here. Multiple threads
+        # Remove all the expired messages times from our list
+        for msg_time in expired_msgs:
+            author_msg_times[author_id].remove(msg_time)
+        # ^ note: we probably need to use a mutex here. Multiple threads
 
-    if len(author_msg_times[author_id]) > over_max_msg_per_window:
-        await message.channel.send(f"MA 2OLNA KFAYA SODA3 YA <@{author_id}>")
-    elif len(author_msg_times[author_id]) > max_msg_per_window:
-        await message.channel.send(f"mkfaya sda3 baa ya <@{author_id}>")
+        if len(author_msg_times[author_id]) > over_max_msg_per_window:
+            await message.channel.send(f"MA 2OLNA KFAYA SODA3 YA <@{author_id}>")
+        elif len(author_msg_times[author_id]) > max_msg_per_window:
+            await message.channel.send(f"mkfaya sda3 baa ya <@{author_id}>")
 
 
 @client.event
